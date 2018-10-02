@@ -1,0 +1,358 @@
+/*AssetList Tags*/
+@font-face {
+  font-family: "Nimbus Bold Cond";
+  src: url("../css/fonts/NimbusSansDOT-BoldCond.eot");
+  src:
+  url("../css/fonts/NimbusSansDOT-BoldCond.woff") format("woff"),
+  url("../css/fonts/NimbusSansDOT-BoldCond.otf") format("opentype"),
+  url("../css/fonts/NimbusSansDOT-BoldCond.svg#filename") format("svg");
+  }
+  
+  @font-face {
+  font-family: "Nimbus Regular Cond";
+  src: url("../css/fonts/NimbusSansDOT-ReguCond.eot");
+  src:
+  url("../css/fonts/NimbusSansDOT-ReguCond.woff") format("woff"),
+  url("../css/fonts/NimbusSansDOT-ReguCond.otf") format("opentype"),
+  url("../css/fonts/NimbusSansDOT-ReguCond.svg#filename") format("svg");
+  }
+  
+  body, html {
+      height: 100%;
+  }
+  
+
+  .assetlist-bg {
+    background-color: #000000;
+  }
+  
+  .col-center {
+    padding-top:12px;
+    width:35%;
+  }
+  .main-container {
+    padding-top:10px;
+  }
+  
+  .bottom-container {
+      overflow: hidden;
+      position: relative;
+  }
+  .arrow-nav {
+    padding:10px;
+    margin-right:10px;
+    background-color: #F25900;
+    -webkit-clip-path: polygon(93% 0, 100% 14%, 100% 100%, 18% 100%, 0 84%, 0 0);
+    clip-path: polygon(75% 0, 100% 20%, 100% 100%, 20% 100%, 0 75%, 0 0);
+  }
+  
+  .profile-nav {
+    padding:10px;
+    margin-left: 10px;
+    margin-right:0px;
+    background-color: #F25900;
+    -webkit-clip-path: polygon(93% 0, 100% 14%, 100% 100%, 18% 100%, 0 84%, 0 0);
+    clip-path: polygon(75% 0, 100% 20%, 100% 100%, 20% 100%, 0 75%, 0 0);
+  }
+  
+  .fa-arrow-left {
+    color:black;
+  }
+  .fa-user {
+    color:black;
+  }
+  
+  
+  .asset-column {
+    margin: 10px;
+    width: 360px;
+  }
+  
+  .header-text {
+    font-family: "Nimbus Regular Cond";
+    color:white;
+    font-size: 20px;
+    display: none;
+  
+  }
+  
+  .header-text:hover {
+    color:white;
+  }
+  .row-s-img-header {width:100%;}
+  
+  .jumbotron-main-page {
+    -webkit-clip-path: polygon(93% 0, 100% 14%, 100% 100%, 18% 100%, 0 84%, 0 0);
+    clip-path: polygon(87% 0, 100% 30px, 100% 100%, 100% 100%, 0 100%, 0 0);
+    width: 100%;
+    border-radius: 0px;
+    padding-top:0px;
+    padding-left:0px;
+    padding-right:0px;
+    padding-bottom: 0px;
+    margin-bottom: 20px;
+    height: 90%;
+  }
+  .critical-jb {
+    background: linear-gradient(#FF0000 80px, #292929 80px);
+  }
+  .degraded-jb {
+    background: linear-gradient(#FFFF00 80px, #292929 80px);
+  }
+  .healthy-jb {
+    background: linear-gradient(#00FF00 80px, #292929 80px);
+  }
+  .offline-jb {
+    background: linear-gradient(#464343 80px, #292929 80px);
+  }
+  
+  .jumbotron-inner {
+    -webkit-clip-path: polygon(93% 0, 100% 14%, 100% 100%, 18% 100%, 0 84%, 0 0);
+    clip-path: polygon(87% 0, 100% 30px, 100% 100%, 100% 100%, 0 100%, 0 0);
+    background-color: #292929 ;
+    border-radius: 0px;
+    margin-bottom: 0px;
+  
+    padding-top:15px;
+    padding-right:15px;
+    padding-left:15px;
+    padding-bottom: 100px;
+  
+  }
+  
+  .jumbotron-machine-status {
+    -webkit-clip-path: polygon(95% 0, 100% 14%, 100% 100%, 18% 100%, 0 84%, 0 0);
+    clip-path: polygon(90% 0, 100% 20px, 100% 100%, 10% 100%, 0 78%, 0 0);
+    background-color: #464343 ;
+    border-radius: 0px;
+    margin-bottom: 15px;
+    margin-top:0px;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:15px;
+    padding-right:15px;
+  }
+  h4 {
+    font-family: "Nimbus Regular Cond";
+    color:white;
+    padding-left:20px;
+    padding-top:5px;
+  }
+  
+  .critical-jb h4, .degraded-jb h4, .healthy-jb h4 {
+    color:#292c30
+  }
+
+  h5 {
+    font-family: "Nimbus Regular Cond";
+    color:white;
+    padding-left:25px;
+    padding-top:5px;
+  }
+
+   .critical-jb h5, .degraded-jb h5, .healthy-jb h5 {
+    color:#292c30
+  }
+
+  .hr-row{
+    padding-left:0px;
+    margin: 0px;
+    width:100%;
+  }
+  
+  .col-machine-status-left{
+    width:100%;
+  }
+  
+  .col-machine-status-right {
+    width:100%;
+  }
+  
+  .machine-status-row {
+    padding-left:0px;
+    padding-right:0px;
+    position: relative;
+  
+  }
+  
+  .canvas-holder {
+    width:50%;
+    height:80%;
+    padding-top:15px;
+    padding-right:0px;
+    padding-bottom:10px;
+    position:absolute;
+    top:10%;
+    right:1%;
+    bottom:10%;
+    z-index:9999999;
+    background-color:#292929;
+    margin-bottom:10px;
+    margin-right:10px;
+    -webkit-clip-path: polygon(93% 0, 100% 14%, 100% 100%, 18% 100%, 0 84%, 0 0);
+    clip-path: polygon(87.6% 0, 100% 12%, 100% 100%, 15% 100%, 0 88%, 0 0);
+  }
+  svg{width:30%; padding: 0px; margin: 0px;}
+  
+  .cv-jumbotron {
+  
+    -webkit-clip-path: polygon(93% 0, 100% 14%, 100% 100%, 18% 100%, 0 84%, 0 0);
+    clip-path: polygon(87% 0, 100% 30px, 100% 100%, 100% 100%, 0 100%, 0 0);
+    background-color: #292929 ;
+    border-radius: 0px;
+    margin-bottom: 0px;
+    margin-top:10px;
+    height:auto;
+    width:100px;
+    height:200px;
+    padding-bottom : -50px;
+    padding-top:10px;
+    padding-right:-10px;
+  }
+  .separator {
+      width:100%;
+      border-width:3px;
+      border-color:#292929;
+      margin:0px;
+      padding:0px;
+      border-style: solid;
+  }
+  .bottom-container{
+      margin-top: 10px;
+  }
+  
+  @media only screen and (min-width:1280px){
+    .machine-1-image {
+      width: 42%;
+      height: 15%;
+      margin-left: 4.5%;
+    }
+  
+    .machine-3-image {
+      width: 30%;
+      height: 9%;
+      margin-left: 10%;
+      margin-bottom: 5%;
+      margin-top: 5%;
+      margin-right: 10%;
+      box-sizing: border-box; 
+    }
+  }
+  
+  @media only screen and (max-width:1280px){
+    .machine-1-image {
+       width: 42%;
+    height: 10%;
+    margin-left: 4.5%;
+    }
+  
+    .machine-3-image {
+      width: 30%;
+      height: 9%;
+      margin-left: 10%;
+      margin-bottom: 5%;
+      margin-top: 5%;
+      margin-right: 10%;
+      box-sizing: border-box; 
+    }
+  }
+
+  a {
+    text-decoration: none;
+    border: none;
+  }
+  a:hover {
+    text-decoration: none;
+    border: none;
+  }
+  a:visited {
+    text-decoration: none;
+    border: none;
+  }
+  .modal-content{
+    background-color:#000000;
+  }
+  .modal-header{
+    background-color:#F25900;
+    font-size-adjust: inherit; 
+    border-bottom: none;     
+  
+  }
+  .modal-body{
+    background-color: #292929;
+  
+  }
+  .modal-footer{
+    display:flex;
+    background-color: #292929;
+    -webkit-box-align: center;
+    align-items: center;
+    padding: 1rem;
+    border-top:none;
+  
+  }
+  .label-note{
+    border-left: 6px solid #F25900;
+    background-color: #464343;
+    font-family: "Nimbus Regular Cond";
+    padding-top: 2px;
+  }
+  /**/
+  
+  
+  @media only screen and (min-width: 780px) {
+      /* For desktop: */
+  
+      .navbar-left {
+        padding-right: 0px;
+      }
+  
+      .row-s-img-header {width:25%;}
+  
+  
+      .col-center {
+        padding-top:12px;
+        width:40%;
+        text-align: center;
+      }
+  
+
+      .asset-column {
+        margin: 10px;
+        width: 360px;
+      }
+      .header-text {
+        display: inline;
+      }
+  
+      .col-1 {
+        width:33.33333333%;
+      }
+      .jumbotron-main-page {
+        width: 24.3%;
+        height: 90%
+      }
+  
+      .navbar-jumbotron-main{
+        height:4%;
+      }
+      .jumbotron-inner {
+        -webkit-clip-path: polygon(93% 0, 100% 14%, 100% 100%, 18% 100%, 0 84%, 0 0);
+        clip-path: polygon(87% 0, 100% 40px, 100% 100%, 100% 100%, 0 100%, 0 0);
+  
+      }
+  
+      .jumbotron-machine-status {
+        -webkit-clip-path: polygon(95% 0, 100% 14%, 100% 100%, 18% 100%, 0 84%, 0 0);
+        clip-path: polygon(90% 0, 100% 28px, 100% 100%, 10% 100%, 0 78%, 0 0);
+  
+      }
+      .jumbotron-main-page {
+        -webkit-clip-path: polygon(93% 0, 100% 14%, 100% 100%, 18% 100%, 0 84%, 0 0);
+        clip-path: polygon(87% 0, 100% 40px, 100% 100%, 100% 100%, 0 100%, 0 0);
+  
+      }
+  }
+
+
+ 

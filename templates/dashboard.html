@@ -1,0 +1,537 @@
+<html><head>
+  <title>Mazak Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../static/dist-css/dashboard.css" rel="stylesheet">
+  <link href="../static/other/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <script src="../static/js/jquery.min.js"></script>
+  <script src="../static/js/bootstrap.min.js"></script>
+  <script src="../static/js/Chart.bundle.js"></script><style type="text/css">/* Chart.js */
+@-webkit-keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}@keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}.chartjs-render-monitor{-webkit-animation:chartjs-render-animation 0.001s;animation:chartjs-render-animation 0.001s;}</style>
+  <script src="../static/other/utils.js"></script>
+  <script src="../static/js/socket.io.min.js"></script>
+  <style>
+      @media only screen and (min-width:1280px){
+      .machine-1-image {
+        width: 42%;
+        height: 15%;
+        margin-left: 4.5%;
+      }
+    
+      .machine-3-image {
+        width: 30%;
+        height: 9%;
+        margin-left: 10%;
+        margin-bottom: 5%;
+        margin-top: 5%;
+        margin-right: 10%;
+        box-sizing: border-box; 
+      }
+    }
+    
+    @media only screen and (max-width:1280px){
+      .machine-1-image {
+         width: 42%;
+      height: 10%;
+      margin-left: 4.5%;
+      }
+    
+      .machine-3-image {
+        width: 30%;
+        height: 9%;
+        margin-left: 10%;
+        margin-bottom: 5%;
+        margin-top: 5%;
+        margin-right: 10%;
+        box-sizing: border-box; 
+      }
+    }
+    </style>
+  
+  <style>
+    .statusclass {
+    -webkit-clip-path: polygon(93% 0, 100% 14%, 100% 100%, 18% 100%, 0 84%, 0 0);
+    clip-path: polygon(87% 0, 100% 35px, 100% 100%, 100% 100%, 0 100%, 0 0);
+    background-color: #F25900;
+    border : 0px;
+    border-radius: 0px;
+    color: white;
+    font-family: "Nimbus Regular Cond";
+  }
+  </style>
+
+
+
+
+  <script>
+
+      Chart.pluginService.register({
+   beforeDraw: function (chart) {
+     if (chart.config.options.elements.center) {
+       var ctx = chart.chart.ctx;
+       var centerConfig = chart.config.options.elements.center;
+       var fontStyle = centerConfig.fontStyle || 'Arial';
+       var txt = centerConfig.text;
+       var color = centerConfig.color || '#000';
+       var sidePadding = centerConfig.sidePadding || 100;
+       var sidePaddingCalculated = (sidePadding/100) * (chart.innerRadius * 2)
+       ctx.font = "40px " + fontStyle;
+       var stringWidth = ctx.measureText(txt).width;
+       var elementWidth = (chart.innerRadius * 2) - sidePaddingCalculated;
+       var widthRatio = elementWidth / stringWidth;
+       var elementHeight = (chart.innerRadius * 2);
+       ctx.textAlign = 'center';
+       ctx.textBaseline = 'middle';
+       var centerX = ((chart.chartArea.left + chart.chartArea.right) / 2);
+       var centerY = ((chart.chartArea.top + chart.chartArea.bottom) / 2);
+       ctx.font = "119% " + fontStyle;
+       ctx.fillStyle = color;
+       ctx.fillText(txt, centerX, centerY);
+     }
+   }
+  });
+
+  function getDoughNut(cv_value, bg_color_health) {
+    cv_value = Number.parseFloat(cv_value).toFixed(2)
+    if (cv_value == 1) {
+      cv_value = 1;
+    }
+    var config_ = {  type: 'doughnut', data: { datasets: [{ data: [ cv_value, 1-cv_value ], 
+                     backgroundColor: [ bg_color_health,"#464343" ], borderColor: [ bg_color_health,"#464343"]}], labels: [ 'HEALTHY', 'DEGRADED']},
+                    options: {  responsive: true, legend: { display: false}, tooltips: { enabled: true },
+                                elements: { center: { text: Number.parseFloat(((cv_value)*100)).toFixed(0)+"%", color: bg_color_health,  fontStyle: 'Helvetica', sidePadding: 15 }},
+                                cutoutPercentage : 80, animation: { animateScale: true,  animateRotate: true }}};
+    return config_;
+  }
+  window.onload = function(){
+    document.getElementById("CurMachineName").innerHTML = 'Sample MC I'
+
+    
+
+    ctx = document.getElementById('Sample MC Idoughtnut').getContext('2d') 
+    new Chart(ctx, config = getDoughNut(0.9,"#00FF00"))
+
+    ctx = document.getElementById('Sample MC IIdoughtnut').getContext('2d') 
+    new Chart(ctx, config = getDoughNut(0.3,"#FF0000"))
+
+    ctx = document.getElementById('Sample MC IIIdoughtnut').getContext('2d') 
+    new Chart(ctx, config = getDoughNut(0.6,"#FFFF00"))
+}
+    
+  
+  </script>
+
+</head>
+<body class="assetlist-bg">
+  <div class="container-fluid main-container">
+    <div class="row justify-content-between">
+      <div class="col-left col-xs-1">
+        <nav class="navbar navbar-left justify-content-start">
+          <a class="navbar-brand arrow-nav " ><i class="fa fa-arrow-left"></i></a>
+          <div class="navbar-nav">
+            <a class="nav-link nav-header header-text" >ASSET LIST<span class="sr-only">(current)</span></a>
+          </div>
+        </nav>
+      </div>
+      <div class="col-center col-xs-1 "><img src="../static/images/MAZAK_logo.png" class="row-s-img-header"></div>
+      <div class="col-right  col-xs-1 ">
+        <nav class="navbar navbar-right justify-content-end">
+
+          <div class="navbar-nav">
+            <a class="nav-link nav-header header-text" href="#">ADMINISTRATOR<span class="sr-only">(current)</span></a>
+          </div>
+          <a class="navbar-brand profile-nav" href="#"><i class="fa fa-user"></i></a>
+        </nav>
+      </div>
+    </div>
+    <div class="container-fluid bottom-container">
+      <div class="row">
+        <div class="col-xs-3 col-md-3 col-lg-3 jumbotron jumbotron-inner" id="inner_div">
+  
+          <div class="jumbotron jumbotron-machine-status">
+            <a href="#" style="border: none;">
+              <div class="row machine-status-row">
+                <div class="col-xs-1 col-machine-status-left justify-content-start"><div class="row healthy-jb" id="Sample MC Ititle"><h5>Sample MC I</h5></div><div class="row hr-row"><p class="separator"></p></div><div class="row"><img src="../static/images/machine1.png" class="machine-1-image"></div></div><div class="canvas-holder"><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div><canvas class="chart-area-critical chartjs-render-monitor" id="Sample MC Idoughtnut" width="106" height="52" style="display: block; height: 42px; width: 85px;"></canvas></div></div></a></div><div class="jumbotron jumbotron-machine-status"><a href="#" style="border: none;"><div class="row machine-status-row"><div class="col-xs-1 col-machine-status-left justify-content-start"><div class="row critical-jb" id="Sample MC IItitle"><h5>Sample MC II</h5></div><div class="row hr-row"><p class="separator"></p></div><div class="row"><img src="../static/images/machine1.png" class="machine-1-image"></div></div><div class="canvas-holder"><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div><canvas class="chart-area-critical chartjs-render-monitor" id="Sample MC IIdoughtnut" width="106" height="52" style="display: block; height: 42px; width: 85px;"></canvas></div></div></a></div><div class="jumbotron jumbotron-machine-status"><a href="#" style="border: none;"><div class="row machine-status-row"><div class="col-xs-1 col-machine-status-left justify-content-start"><div class="row degraded-jb" id="Sample MC IIItitle"><h5>Sample MC III</h5></div><div class="row hr-row"><p class="separator"></p></div><div class="row"><img src="../static/images/machine1.png" class="machine-1-image"></div></div><div class="canvas-holder"><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div><canvas class="chart-area-degraded chartjs-render-monitor" id="Sample MC IIIdoughtnut" width="106" height="52" style="display: block; height: 42px; width: 85px;"></canvas></div></div></a></div></div>
+        <div class="col-xs-9 col-md-9 col-lg-9 col-components-right">
+          <div class=" container-fluid components-right-container">
+            <div class="row mb-3">
+              <div class="col-xs-9 col-md-9 col-lg-9 mr-3 p-3 machine-info-tab" id="rectangle">
+                <div class="row mb-3">
+                    <div class="col-8 col-left pb-0 pt-0" id="inner_div">
+                      <h4 id="CurMachineName" style="background-color:#464343; height: 40px" class="label-note pt-2">Sample MC III</h4>
+                    </div>
+                    <div class="col-2 col-left ml-5 mr-4 pb-0 pt-0" id="inner_div">
+                      <h4 id="times" style="background-color:#464343; height: 4.8%;width:165%" class="label-note pt-2">4:44:19</h4>
+                    </div>
+                    <script>
+                      (function () {
+                              function checkTime(i) {
+                                  return (i < 10) ? "0" + i : i;
+                              }
+
+                              function startTime() {
+                                  var today = new Date(),
+                                      h = (checkTime(today.getHours()))%12||12;
+                                      m = checkTime(today.getMinutes());
+                                      s = checkTime(today.getSeconds());
+                                  document.getElementById('times').innerHTML = h + ":" + m + ":" + s;
+                                  t = setTimeout(function () {
+                                      startTime()
+                                  }, 500);
+                              }
+                              startTime();
+                          })();
+                    </script>
+                    <!-- <div class="col-1 col-components-right col-right gear ml-2">
+                      <a class="navbar-brand profile-nav" href="#"><i class="fa fa-gear" style="color:black"></i></a>
+                    </div> -->
+                </div>
+                <div class="row">
+                  <div class="col ml-2 mr-3 mr-4 pl-0 pr-0">
+                      <ul class=" row nav-row nav nav-tabs justify-content-between border-bottom-0" id="myTab" role="tablist">
+                        <li class=" col-lg-4 nav-col  nav-item">
+                            <a class="nav-link nav-item-custom active pr-5 font_labels" style="-webkit-clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0); clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0);" data-toggle="modal" href="#myModal" onclick="operatingInfo()">OPERATING INFORMATION</a>
+                         <div class="modal fade" id="myModal" role="dialog">
+                            <div class="modal-dialog modal-lg" style="width:1250px">
+                              <div class="modal-content">
+                                  <div class="modal-header" style="padding:0px 0px;">
+                                      <button type="button" class="close mr-auto ml-0" data-dismiss="modal">×</button>
+                                      <h4 class="mr-auto"><span></span>OPERATING INFORMATION</h4>
+                                  </div>
+                                    <div class="modal-body" stgearyle="padding:40px 50px;">
+                                      
+                                        <div id="table_operation" style="display: block">
+                                            <table class="table-Machine table-bordered table-dark table-sm" style="width:100%">
+  
+                                              
+                                              <tbody><tr>
+                                                <th class="table-info font_labels" colspan="15">FIELD NAME</th>    
+                                                <th class="table-info font_labels" colspan="15">FIELD VALUE</th>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Power ON Time</td>    
+                                                <td id="td1" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Auto Operation Time</td>    
+                                                <td id="td2" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Auto Cut Time</td>    
+                                                <td id="td3" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Total Cut Time</td>    
+                                                <td id="td4" colspan="15"></td>    
+                                              </tr><tr>
+                                                <td colspan="15">Total Time</td>    
+                                                <td id="td5" colspan="15"></td>    
+                                              </tr><tr>
+                                                <td colspan="15">Total Spindle Rotation Time</td>    
+                                                <td id="td6" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Total Spindle Rotation Cycle</td>    
+                                                <td id="td7" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Total Tool Clamp Cycle</td>    
+                                                <td id="td8" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Total Spindle Drive Capacitor Used Time</td>    
+                                                <td id="td9" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Total Spindle Drive Fan Used Time</td>    
+                                                <td id="td10" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Total Spindle Drive Battery Used Time</td>    
+                                                <td id="td11" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Total Spindle Bearing Rotation Cycle</td>    
+                                                <td id="td12" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Total Spindle Encoder Rotation Cycle</td>    
+                                                <td id="td13" colspan="15"></td>    
+                                              </tr>
+                                             
+                                            </tbody></table>
+                                        </div> 
+                                    </div>                                                                       
+                              </div>        
+                                    
+                              
+                            </div>
+                        </div>    
+                        </li> 
+                        <li class=" col-lg-4 nav-col nav-item nav-item-custom">
+                          <a class="nav-link info-link nav-item-custom active pr-5 font_labels" style="-webkit-clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0); clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0);" data-toggle="modal" href="#myDataModal">DATA ACQUISITION MODEL</a>
+                         <div class="modal fade" id="myDataModal" role="dialog">
+                            <div class="modal-dialog modal-lg" style="width:1250px">
+                              <div class="modal-content">
+                                  <div class="modal-header" style="padding:0px 0px;">
+                                      <button type="button" class="close mr-auto ml-0" data-dismiss="modal">×</button>
+                                      <h4 class="mr-auto"><span></span>DATA ACQUISITION MODEL</h4>
+                                  </div>
+                                    <div class="modal-body" stgearyle="padding:40px 50px;">
+                                      
+                                        <div id="table_operation" style="display: block">
+                                            <table class="table-Machine table-bordered table-dark table-sm" style="width:100%">
+  
+                                              
+                                              <tbody><tr>
+                                                <th class="table-info font_labels" colspan="15">FIELD NAME</th>    
+                                                <th class="table-info font_labels" colspan="15">FIELD VALUE</th>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Signal 1</td>    
+                                                <td id="td1" colspan="15">Vibration</td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Signal 2</td>    
+                                                <td id="td2" colspan="15">current</td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Sampling Rate</td>    
+                                                <td id="td3" colspan="15">Default</td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">No of Channels</td>    
+                                                <td id="td4" colspan="15">2</td>    
+                                              </tr>
+                                             
+                                            </tbody></table>
+                                        </div> 
+                                    </div>                                                                       
+                              </div>        
+                                    
+                              
+                            </div>
+                        </div>    
+                        </li>
+                        <li class=" col-lg-4 nav-col nav-item nav-item-custom">
+                          <a class="nav-link info-link nav-item-custom active pr-5 font_labels" style="-webkit-clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0); clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0);" data-toggle="modal" href="#myAnalysisModal">ANALYSIS MODEL</a>
+                          <div class="modal fade" id="myAnalysisModal" role="dialog">
+                            <div class="modal-dialog modal-lg" style="width:1250px">
+                              <div class="modal-content">
+                                  <div class="modal-header" style="padding:0px 0px;">
+                                      <button type="button" class="close mr-auto ml-0" data-dismiss="modal">×</button>
+                                      <h4 class="mr-auto"><span></span>ANALYSIS MODEL</h4>
+                                  </div>
+                                    <div class="modal-body" stgearyle="padding:40px 50px;">
+                                      
+                                        <div id="table_operation" style="display: block">
+                                            <table class="table-Machine table-bordered table-dark table-sm" style="width:100%">
+  
+                                              
+                                              <tbody><tr>
+                                                <th class="table-info font_labels" colspan="15">FIELD NAME</th>    
+                                                <th class="table-info font_labels" colspan="15">FIELD VALUE</th>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Regime Seperation</td>    
+                                                <td id="td1" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Model 1</td>    
+                                                <td id="td2" colspan="15"></td>    
+                                              </tr>
+                                              <tr>
+                                                <td colspan="15">Sample</td>    
+                                                <td id="td3" colspan="15">Default</td>    
+                                              </tr>
+         
+                                             
+                                            </tbody></table>
+                                        </div> 
+                                    </div>                                                                       
+                              </div>        
+                                    
+                              
+                            </div>
+                        </div>  
+                        </li>                        
+                      </ul>
+                  </div>
+                </div>                
+              </div>
+              <div class="col-lg p-3 statusclass" style="font: size 25px;display:inline">
+                  <h3 class="font_labels" align="center">MACHINE STATUS</h3>
+                  <div style="color:white;background-color:#323233fd; height: 75px;font-size:125%;">
+                    <label border="1px" bg-color="#F25900" id="status" align="center" style="display:inline;position:absolute">Machine Disconnected</label>
+                  </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="jumbotron col-components-bottom">
+                <ul class="border-0 row nav-row nav nav-tabs justify-content-between" id="myTab" role="tablist">
+                  <li class=" col-lg-3 nav-col nav-item ">
+                    <a class="nav-link nav-item-custom active font_labels pr-5" id="area_chart_tab" data-toggle="tab" href="#area_chart" role="tab" aria-controls="area_chart" aria-selected="true">HEALTH CONDITION</a>
+                  </li>
+                  <li class=" col-lg-3 nav-col nav-item nav-item-custom">
+                    <a class="nav-link nav-item-custom font_labels pr-5" id="radar_chart_tab" data-toggle="tab" href="#radar_chart" role="tab" aria-controls="radar_chart" aria-selected="true">HEALTH DIAGNOSIS</a>
+                  </li>
+                  <li class=" col-lg-3 nav-col nav-item nav-item-custom">
+                    <a class="nav-link nav-item-custom font_labels pr-5" id="area_chart_tab_1" data-toggle="tab" href="#area_chart_1" role="tab" aria-controls="area_chart_1" aria-selected="true">FEATURES</a>
+                  </li>
+                  <li class=" col-lg-3 nav-col nav-item nav-item-custom">
+                    <a class="nav-link nav-item-custom font_labels pr-5" id="maintenance-tab" data-toggle="tab" href="#maintenance_records" role="tab" aria-controls="maintenance" aria-selected="true" onclick="recordsInfo()">MAINTENANCE RECORDS</a>
+                  </li> 
+                </ul>
+                <div class="d-lg-flex h5 row-right mt-3 col-12" style="position:absolute;">
+                  <div class="col-2-5">
+                    
+                        <label class="label-note pl-4 pr-3 pt-1 col-9" border="1px" style="background-color:#464343; height:30px; color:#F2F2F2; align-content:center;">SPINDLE - 1</label>
+                        <label style="Display:flex;vertical-align : middle;color:white;font-size:10;">MACHINE NAME</label>  
+                  </div>
+                  <div class="col-2-5">
+                                                         
+                    <label id="date" class="label-note pl-4 pr-3 pt-1 col-9" border="1px" align="center" style="background-color:#464343; height: 30px; color:#F2F2F2;"></label>
+                    <label style="Display:flex;vertical-align : middle;color:white;font-size:10;">DATE</label>
+                  </div>
+                  <div class="col-2-5">
+                      <label id="time" class="label-note pl-4 pr-3 pt-1 col-9" border="1px" align="center" style="background-color:#464343; height: 30px; color:#F2F2F2;"></label>
+                      <label style="Display:flex;vertical-align : middle;color:white;font-size:10;">TIME</label>
+                  </div>
+                  <div class="col-2-5">
+                    <label id="health_value" class="label-note pl-4 pr-3 pt-1 col-9" border="1px" align="center" style="background-color:#464343; height: 30px; color:#F2F2F2;"></label>
+                    <label style="Display:flex;vertical-align : middle;color:white;font-size:10;">HEALTH VALUE</label>
+                  </div>
+
+                  <div class="d-flex col-2" style="z-index:20;">
+                    <a class="mr-2" href="#"><i class="fa fa-sort" style="color:F25900"></i></a>
+                    <a class="mr-2" href="#"><i class="fa fa-gear" style="color:#F25900"></i></a>       
+                    <a class="mr-2" data-toggle="modal" href="#myChoice"><i class="fa fa-list-ul" style="color:#F25900"></i></a>             
+                    <a class="mr-2" href="#" id="download" onclick="downloadData()"><i class="fa fa-download" style="color:#F25900"></i></a>
+                    <a class="mr-2" data-toggle="modal" href="#myNote"><i class="fa fa-sticky-note-o" style="color:#F25900"></i></a>
+                  </div>  
+                    <div class="modal fade" id="myNote" role="dialog" onload="startTime()">
+                        <div class="modal-dialog modal-lg" style="width:1250px">
+                          <div class="modal-content">
+                              <div class="modal-header" style="padding:0px 0px;">
+                                  
+                                      <button type="button" class="close mr-auto ml-0" data-dismiss="modal">×</button>
+                                      <h4 class="mr-auto font_labels pr-5"><span></span>ADD RECORD</h4>
+
+                              </div>
+                             
+                                <div class="modal-body" stgearyle="padding:40px 50px;">
+                                    <div class="col-12 mb-4"> 
+                                        <row>
+                                            <label id="dates" class="col-3 label-note ml-4 mr-5" border="1px" align="center" style="background-color:#464343; height: 30px; color:#F25900;"></label>
+                                            <label id="tym" class="col-3 label-note mr-5" border="1px" align="center" style="background-color:#464343; height: 30px; color:#F25900;"></label>
+                                          
+                                            <label id="health_values" class="label-note mr-2 col-3" border="1px" align="center" style="background-color:#464343; height: 30px; color:#F25900;"></label>
+                                        </row>                             
+
+                                    </div>
+                                    <form action="#" id="Condition_select">
+                                    <div class="row col-12">
+                                      <div class="col-4 ml-4" style="color: #F25900;font-size:  13px;">
+                                          
+                                            
+                                              <input type="radio" name="Condition" value="ROUTINE HEALTH ASSESSMENT" class="mb-3"> ROUTINE HEALTH ASSESSMENT<br>
+                                              <input type="radio" name="Condition" value="TOOL CHANGE" class="mb-3"> TOOL CHANGE<br>
+                                              <input type="radio" name="Condition" value="JOB CHANGE" class="mb-3"> JOB CHANGE<br>  
+                                              <input type="radio" name="Condition" value="MAINTAINANCE PERFORMED" class="mb-3"> MAINTAINANCE PERFORMED<br>
+                                              <input type="radio" name="Condition" value="ABNORMAL CONDITION" class="mb-3"> ABNORMAL CONDITION
+                                              <!-- <input type="button" class="btn btn-default nav-link info-link nav-item-custom active pl-5 ml-auto pr-5" style="-webkit-clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0); clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0);background-color: #f25900;" data-toggle="tab" role="tab" data-dismiss="modal"onclick="feature_submit()" value="submit">                                             
+                                            <button type="button" class="btn btn-default nav-link info-link nav-item-custom active pl-5 mr-auto pr-5" style="-webkit-clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0); clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0); background-color: #f25900;" data-toggle="tab" role="tab" data-dismiss="modal">cancel</button> -->
+                                            
+                                      </div>
+                                    
+                                      <div class="col mr-4">
+                                          <textarea name="instruction" class="note-area w-100 label-note" id="text_note"></textarea>
+                                      </div>
+                                    </div></form>
+                                
+                                </div>         
+                                <div class="modal-footer" style="align:center;">
+                                    <input type="submit" class="btn btn-default nav-link info-link nav-item-custom active pl-5 ml-auto pr-5" style="-webkit-clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0); clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0);background-color: #f25900;" data-toggle="tab" role="tab" data-dismiss="modal" onclick="submitRecord()" value="submit">
+                                    <button type="button" class="btn btn-default nav-link info-link nav-item-custom active pl-5 mr-auto pr-5" style="-webkit-clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0); clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0); background-color: #f25900;" data-toggle="tab" role="tab" data-dismiss="modal">cancel</button>
+                                </div>
+                              
+                               
+                                                                                                    
+                          </div>        
+                                
+                          
+                        </div>
+                    </div>
+                    <div class="modal fade" id="myChoice" role="dialog">
+                      <div class="modal-dialog" style="width:1250px">
+                        <div class="modal-content">
+                              <div class="modal-header" style="padding:0px 0px;">                                  
+                                      <button type="button" class="close mr-auto ml-0" data-dismiss="modal">×</button>
+                                      <h4 class="mr-auto font_labels pr-5"><span></span>SELECT ONE FEATURE</h4>
+                              </div>
+                              <form action="#" id="feature_select" style="color:#f25900;font-size: 20;">
+                              <div class="modal-body" style="padding:40px 50px;">                                  
+                                  <div class="row col-12 ml-5">
+                                    <div style="color:#f25900">                                        
+                                          
+        
+                                            <input type="radio" name="FEATURE" value="8" class="mb-3"> LUBRICATION VALUE<br>
+                                            <input type="radio" name="FEATURE" value="4" class="mb-3"> BEARING VALUE<br>
+                                            <input type="radio" name="FEATURE" value="3" class="mb-3"> UNBALANCE VALUE<br><br>           
+                                            
+                                          
+                                    </div>                                    
+                                  </div>
+                                </div> 
+                                
+                                
+                              <div class="modal-footer" style="align:center;">
+                                  <input type="button" class="btn btn-default nav-link info-link nav-item-custom active pl-5 ml-auto mr-auto pr-5" style="-webkit-clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0); clip-path: polygon(90% 0, 100% 70%, 100% 100%, 10% 100%, 0 30%, 0 0);background-color: #f25900;" data-toggle="tab" role="tab" data-dismiss="modal" onclick="feature_submit()" value="submit">
+                                  
+                              </div>                                
+                            </form>                                                    
+                        </div>    
+                      </div>
+                  </div>
+                    
+                </div> 
+                <div class="mb-5 mt-1"><br></div>
+                <div class="tab-content" id="myTabContent" style="z-index: -1">
+                  <div class="tab-pane fade show active  justify-content-start" id="area_chart" role="tabpanel" aria-labelledby="area_chart_tab">
+                    <div class="container-fluid tab-pane-container" style="width:100%;">
+                      <div class="wrapper col-lg-12" id="area-chart-holder"><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div><canvas id="area-chart-fig" width="605" height="302" class="chartjs-render-monitor" style="display: block; height: 242px; width: 484px;"></canvas></div>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade justify-content-start" id="radar_chart" role="tabpanel" aria-labelledby="radar_chart_tab">
+                    <div class="container-fluid tab-pane-container" style="width:100%;">
+                      <div class="wrapper col-lg-12" id="radar-chart-holder"><canvas style="width:100%;height:60%;" id="radar-chart-fig"></canvas></div>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade justify-content-start" id="area_chart_1" role="tabpanel" aria-labelledby="area_chart_tab_1">
+                    <div class="container-fluid tab-pane-container" style="width:100%;">
+                      <div class="wrapper col-lg-12" id="area-chart-holder_1"><canvas style="width:100%;height:60%;" id="area-chart-fig_1"></canvas></div>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade justify-content-start" id="maintenance_records" role="tabpanel" aria-labelledby="maintenance"> 
+                    <div class="container-fluid tab-pane-container" style="width:100%;">
+                      <div class="wrapper col-lg-12" id="maintenance-records-holder">
+                           <div style="overflow:scroll;height:85%;width:100%;overflow:auto">                              
+                              <div id="table_records" style="display: block"></div>
+                           </div>   
+                      </div>
+                    </div>
+                  </div>
+                      
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</body></html>
